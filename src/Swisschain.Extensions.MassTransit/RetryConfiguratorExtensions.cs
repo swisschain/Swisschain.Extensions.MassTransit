@@ -10,9 +10,7 @@ namespace Swisschain.Extensions.MassTransit
     {
         public static IRetryConfigurator AddRetriesAudit(this IRetryConfigurator configurator, IServiceProvider provider)
         {
-            configurator.ConnectRetryObserver(
-                new MessageRetryAuditObserver(
-                    provider.GetRequiredService<ILogger<MessageRetryAuditObserver>>()));
+            configurator.ConnectRetryObserver(provider.GetRequiredService<MessageRetryAuditObserver>());
 
             return configurator;
         }
