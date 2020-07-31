@@ -1,7 +1,6 @@
 ﻿using System;
 using GreenPipes.Configurators;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Swisschain.Extensions.MassTransit.Audit;
 
 namespace Swisschain.Extensions.MassTransit

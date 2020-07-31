@@ -11,18 +11,21 @@ namespace Swisschain.Extensions.MassTransit
     {
         private readonly IBusControl _busControl;
         private readonly ILogger<BusHost> _logger;
+        private readonly BusHostConfig _config;
         private readonly MessageConsumptionAuditObserver _consumingAuditObserver;
         private readonly MessagePublishingAuditObserver _publishingAuditObserver;
         private readonly MessageSendingAuditObserver _sendingAuditObserver;
 
         public BusHost(IBusControl busControl, 
             ILogger<BusHost> logger,
+            BusHostConfig config,
             MessageConsumptionAuditObserver consumingAuditObserver,
             MessagePublishingAuditObserver publishingAuditObserver,
             MessageSendingAuditObserver sendingAuditObserver)
         {
             _busControl = busControl;
             _logger = logger;
+            _config = config;
             _consumingAuditObserver = consumingAuditObserver;
             _publishingAuditObserver = publishingAuditObserver;
             _sendingAuditObserver = sendingAuditObserver;
@@ -34,9 +37,12 @@ namespace Swisschain.Extensions.MassTransit
 
             await _busControl.StartAsync(cancellationToken);
 
-            _busControl.ConnectConsumeObserver(_consumingAuditObserver);
-            _busControl.ConnectPublishObserver(_publishingAuditObserver);
-            _busControl.ConnectSendObserver(_sendingAuditObserver);
+            if (_config.EnableMessagesAudit)
+            {
+                _busControl.ConnectConsumeObserver(_consumingAuditObserver);
+                _busControl.ConnectPublishObserver(_publishingAuditObserver);
+                _busControl.ConnectSendObserver(_sendingAuditObserver);
+            }
 
             _logger.LogInformation("Bus host has been started");
         }
