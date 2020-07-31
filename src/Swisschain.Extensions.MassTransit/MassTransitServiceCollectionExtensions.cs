@@ -6,11 +6,11 @@ namespace Swisschain.Extensions.MassTransit
 {
     public static class MassTransitServiceCollectionExtensions
     {
-        public static IServiceCollection AddMassTransitBusHost(this IServiceCollection services, Action<BusHostConfig> configSetup)
+        public static IServiceCollection AddMassTransitBusHost(this IServiceCollection services, Action<BusHostConfig> configSetup = null)
         {
             var config = new BusHostConfig();
 
-            configSetup.Invoke(config);
+            configSetup?.Invoke(config);
 
             services.AddTransient<MessageConsumptionAuditObserver>();
             services.AddTransient<MessagePublishingAuditObserver>();
