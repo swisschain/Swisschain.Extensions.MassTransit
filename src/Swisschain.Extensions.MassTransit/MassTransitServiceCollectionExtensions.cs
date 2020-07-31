@@ -12,6 +12,8 @@ namespace Swisschain.Extensions.MassTransit
 
             configSetup?.Invoke(config);
 
+            services.AddSingleton(config);
+
             services.AddTransient<MessageConsumptionAuditObserver>();
             services.AddTransient<MessagePublishingAuditObserver>();
             services.AddTransient<MessageSendingAuditObserver>();
