@@ -1,5 +1,6 @@
 ﻿using System;
 using GreenPipes;
+using GreenPipes.Configurators;
 using MassTransit;
 using MassTransit.EndpointConfigurators;
 
@@ -9,23 +10,40 @@ namespace Swisschain.Extensions.MassTransit.Retries
     {
         public void EndpointConfigured<T>(T configurator) where T : IReceiveEndpointConfigurator
         {
-            configurator.UseScheduledRedelivery(r =>
-                r.Intervals(
+            configurator.UseScheduledRedelivery(x =>
+            {
+                x.Intervals(
                     TimeSpan.FromSeconds(5),
                     TimeSpan.FromSeconds(30),
                     TimeSpan.FromSeconds(60),
                     TimeSpan.FromMinutes(10),
-                    TimeSpan.FromMinutes(30)));
+                    TimeSpan.FromMinutes(30));
 
-            configurator.UseMessageRetry(y =>
+                ConfigureExceptions(x);
+            });
+
+            configurator.UseMessageRetry(x =>
             {
-                y.Intervals(
+                x.Intervals(
                     TimeSpan.FromMilliseconds(0),
                     TimeSpan.FromMilliseconds(100),
                     TimeSpan.FromMilliseconds(200),
                     TimeSpan.FromSeconds(1),
                     TimeSpan.FromSeconds(3));
+
+                ConfigureExceptions(x);
             });
+        }
+
+        private static void ConfigureExceptions(IExceptionConfigurator configurator)
+        {
+            configurator.Ignore<ArgumentException>();
+            configurator.Ignore<NullReferenceException>();
+            configurator.Ignore<InvalidCastException>();
+            configurator.Ignore<IndexOutOfRangeException>();
+            configurator.Ignore<InvalidOperationException>();
+            configurator.Ignore<NotSupportedException>();
+            configurator.Ignore<NotImplementedException>();
         }
     }
 }
