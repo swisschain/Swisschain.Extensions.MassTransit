@@ -8,6 +8,15 @@ namespace Swisschain.Extensions.MassTransit.Retries
 {
     internal class DefaultReceiveEndpointRetriesConfigurationObserver : IEndpointConfigurationObserver
     {
+        private readonly IServiceProvider _serviceProvider;
+        private readonly DefaultReceiveEndpointRetriesOptions _options;
+
+        public DefaultReceiveEndpointRetriesConfigurationObserver(IServiceProvider serviceProvider, DefaultReceiveEndpointRetriesOptions options)
+        {
+            _serviceProvider = serviceProvider;
+            _options = options;
+        }
+
         public void EndpointConfigured<T>(T configurator) where T : IReceiveEndpointConfigurator
         {
             configurator.UseScheduledRedelivery(x =>
@@ -24,6 +33,11 @@ namespace Swisschain.Extensions.MassTransit.Retries
 
             configurator.UseMessageRetry(x =>
             {
+                if (_options.AuditRetries)
+                {
+                    x.AddRetriesAudit(_serviceProvider);
+                }
+
                 x.Intervals(
                     TimeSpan.FromMilliseconds(0),
                     TimeSpan.FromMilliseconds(100),
