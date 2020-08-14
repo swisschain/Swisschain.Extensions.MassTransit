@@ -55,7 +55,6 @@ namespace Swisschain.Extensions.MassTransit.Retries
             configurator.Ignore<NullReferenceException>();
             configurator.Ignore<InvalidCastException>();
             configurator.Ignore<IndexOutOfRangeException>();
-            configurator.Ignore<InvalidOperationException>();
             configurator.Ignore<NotSupportedException>();
             configurator.Ignore<NotImplementedException>();
         }
