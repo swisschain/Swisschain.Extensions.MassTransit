@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Reflection;
+using System.Threading.Tasks;
 using GreenPipes;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -7,7 +8,14 @@ namespace Swisschain.Extensions.MassTransit.Audit
 {
     sealed class MessageRetryAuditObserver : IRetryObserver
     {
+        private static readonly PropertyInfo ConsumeContextMessageProperty;
+
         private readonly ILogger<MessageRetryAuditObserver> _logger;
+
+        static MessageRetryAuditObserver()
+        {
+            ConsumeContextMessageProperty = typeof(ConsumeContext<>).GetProperty("Message", BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
+        }
 
         public MessageRetryAuditObserver(ILogger<MessageRetryAuditObserver> logger)
         {
@@ -26,17 +34,17 @@ namespace Swisschain.Extensions.MassTransit.Audit
 
         public Task PreRetry<T>(RetryContext<T> context) where T : class, PipeContext
         {
-            var c = (ConsumeContext)context.Context;
-            var message = c.TryGetMessage<T>(out var consumeContext);
+            var consumeContext = (ConsumeContext)context.Context;
+            var message = ConsumeContextMessageProperty?.GetValue(context);
 
             _logger.LogWarning("Message is being retried {@context}", new
             {
-                MessageId = c.MessageId,
-                ConversationId = c.ConversationId,
-                CorrelationId = c.CorrelationId,
-                RedeliveryCount = c.GetRedeliveryCount(),
-                SentTime = c.SentTime,
-                Message = consumeContext?.Message,
+                MessageId = consumeContext.MessageId,
+                ConversationId = consumeContext.ConversationId,
+                CorrelationId = consumeContext.CorrelationId,
+                RedeliveryCount = consumeContext.GetRedeliveryCount(),
+                SentTime = consumeContext.SentTime,
+                Message = message,
                 RetryAttempt = context.RetryAttempt
             });
 
