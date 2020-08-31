@@ -71,7 +71,12 @@ namespace Swisschain.Extensions.MassTransit.Audit
                 consumeContext.GetType(),
                 x =>
                 {
-                    var messageType = consumeContext.GetType().GetGenericArguments().Single();
+                    var messageType = consumeContext
+                        .GetType()
+                        .GetGenericArguments()
+                        .Single()
+                        .GetGenericArguments()
+                        .Single();
                     var genericConsumeContextType = typeof(ConsumeContext<>).MakeGenericType(messageType);
                     var messageProperty = genericConsumeContextType.GetProperty("Message", BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
 
