@@ -24,7 +24,8 @@ namespace Swisschain.Extensions.MassTransit.Audit
                     ConversationId = context.ConversationId,
                     CorrelationId = context.CorrelationId,
                     SentTime = context.SentTime,
-                    Message = context.Message
+                    Message = context.Message,
+                    MessageType = context.Message.GetType()
                 });
 
             return Task.CompletedTask;
@@ -41,7 +42,12 @@ namespace Swisschain.Extensions.MassTransit.Audit
                 "Message publishing has been failed {@context}",
                 new
                 {
-                    MessageId = context.MessageId
+                    MessageId = context.MessageId,
+                    ConversationId = context.ConversationId,
+                    CorrelationId = context.CorrelationId,
+                    SentTime = context.SentTime,
+                    Message = context.Message,
+                    MessageType = context.Message.GetType()
                 });
 
             return Task.CompletedTask;

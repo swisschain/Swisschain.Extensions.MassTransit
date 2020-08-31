@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Reflection;
 using System.Threading.Tasks;
 using GreenPipes;
 using MassTransit;
@@ -8,13 +10,13 @@ namespace Swisschain.Extensions.MassTransit.Audit
 {
     sealed class MessageRetryAuditObserver : IRetryObserver
     {
-        private static readonly PropertyInfo ConsumeContextMessageProperty;
+        private static readonly ConcurrentDictionary<Type, PropertyInfo> ConsumeContextMessagePropertiesOfT;
 
         private readonly ILogger<MessageRetryAuditObserver> _logger;
 
         static MessageRetryAuditObserver()
         {
-            ConsumeContextMessageProperty = typeof(ConsumeContext<>).GetProperty("Message", BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
+            ConsumeContextMessagePropertiesOfT = new ConcurrentDictionary<Type, PropertyInfo>();
         }
 
         public MessageRetryAuditObserver(ILogger<MessageRetryAuditObserver> logger)
@@ -35,7 +37,7 @@ namespace Swisschain.Extensions.MassTransit.Audit
         public Task PreRetry<T>(RetryContext<T> context) where T : class, PipeContext
         {
             var consumeContext = (ConsumeContext)context.Context;
-            var message = ConsumeContextMessageProperty?.GetValue(context);
+            var message = GetMessage(consumeContext);
 
             _logger.LogWarning("Message is being retried {@context}", new
             {
@@ -45,6 +47,7 @@ namespace Swisschain.Extensions.MassTransit.Audit
                 RedeliveryCount = consumeContext.GetRedeliveryCount(),
                 SentTime = consumeContext.SentTime,
                 Message = message,
+                MessageType = message?.GetType(),
                 RetryAttempt = context.RetryAttempt
             });
 
@@ -59,6 +62,15 @@ namespace Swisschain.Extensions.MassTransit.Audit
         public Task RetryComplete<T>(RetryContext<T> context) where T : class, PipeContext
         {
             return Task.CompletedTask;
+        }
+
+        private static object GetMessage(ConsumeContext consumeContext)
+        {
+            var consumeContextMessagePropertyOfT = ConsumeContextMessagePropertiesOfT.GetOrAdd(
+                consumeContext.GetType(),
+                x => consumeContext.GetType().GetProperty("Message", BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty));
+
+            return consumeContextMessagePropertyOfT.GetValue(consumeContext);
         }
     }
 }
