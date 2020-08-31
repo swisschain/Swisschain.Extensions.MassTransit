@@ -51,6 +51,11 @@ namespace Swisschain.Extensions.MassTransit.Audit
                 new
                 {
                     MessageId = context.MessageId,
+                    ConversationId = context.ConversationId,
+                    CorrelationId = context.CorrelationId,
+                    RedeliveryCount = context.GetRedeliveryCount(),
+                    SentTime = context.SentTime,
+                    Message = context.Message,
                     ElapsedTime = context.ReceiveContext.ElapsedTime
                 });
 
