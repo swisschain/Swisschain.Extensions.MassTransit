@@ -37,7 +37,7 @@ namespace Swisschain.Extensions.MassTransit.Audit
 
         public Task PreRetry<T>(RetryContext<T> context) where T : class, PipeContext
         {
-            var consumeContext = (ConsumeContext<T>)context.Context;
+            var consumeContext = (ConsumeContext)context.Context;
             var message = GetMessage(consumeContext);
 
             _logger.LogWarning("Message is being retried {@context}", new
@@ -73,8 +73,6 @@ namespace Swisschain.Extensions.MassTransit.Audit
                 {
                     var messageType = consumeContext
                         .GetType()
-                        .GetGenericArguments()
-                        .Single()
                         .GetGenericArguments()
                         .Single();
                     var genericConsumeContextType = typeof(ConsumeContext<>).MakeGenericType(messageType);
