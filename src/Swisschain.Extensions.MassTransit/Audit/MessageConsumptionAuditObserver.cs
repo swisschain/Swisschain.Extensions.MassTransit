@@ -25,7 +25,8 @@ namespace Swisschain.Extensions.MassTransit.Audit
                     CorrelationId = context.CorrelationId,
                     RedeliveryCount = context.GetRedeliveryCount(),
                     SentTime = context.SentTime,
-                    Message = context.Message
+                    Message = context.Message,
+                    MessageType = context.Message.GetType()
                 });
 
             return Task.CompletedTask;
@@ -38,7 +39,8 @@ namespace Swisschain.Extensions.MassTransit.Audit
                 new
                 {
                     MessageId = context.MessageId,
-                    ElapsedTime = context.ReceiveContext.ElapsedTime
+                    ElapsedTime = context.ReceiveContext.ElapsedTime,
+                    MessageType = context.Message.GetType()
                 });
 
             return Task.CompletedTask;
@@ -51,6 +53,12 @@ namespace Swisschain.Extensions.MassTransit.Audit
                 new
                 {
                     MessageId = context.MessageId,
+                    ConversationId = context.ConversationId,
+                    CorrelationId = context.CorrelationId,
+                    RedeliveryCount = context.GetRedeliveryCount(),
+                    SentTime = context.SentTime,
+                    Message = context.Message,
+                    MessageType = context.Message.GetType(),
                     ElapsedTime = context.ReceiveContext.ElapsedTime
                 });
 
