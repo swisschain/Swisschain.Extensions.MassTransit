@@ -35,7 +35,7 @@ namespace Swisschain.Extensions.MassTransit.Audit
             var consumeContext = (ConsumeContext)context.Context;
             var message = GetMessage(consumeContext);
 
-            _logger.LogWarning("Message processing has been failed {@context}", new
+            _logger.LogWarning(context.Exception, "Message processing has been failed {@context}", new
             {
                 MessageId = consumeContext.MessageId,
                 ConversationId = consumeContext.ConversationId,
@@ -44,8 +44,7 @@ namespace Swisschain.Extensions.MassTransit.Audit
                 SentTime = consumeContext.SentTime,
                 Message = message,
                 MessageType = message?.GetType(),
-                RetryAttempt = context.RetryAttempt,
-                Exception = context.Exception
+                RetryAttempt = context.RetryAttempt
             });
 
             return Task.CompletedTask;
@@ -56,7 +55,7 @@ namespace Swisschain.Extensions.MassTransit.Audit
             var consumeContext = (ConsumeContext)context.Context;
             var message = GetMessage(consumeContext);
 
-            _logger.LogWarning("Message is being retried {@context}", new
+            _logger.LogInformation("Message is being retried {@context}", new
             {
                 MessageId = consumeContext.MessageId,
                 ConversationId = consumeContext.ConversationId,
@@ -76,7 +75,7 @@ namespace Swisschain.Extensions.MassTransit.Audit
             var consumeContext = (ConsumeContext)context.Context;
             var message = GetMessage(consumeContext);
 
-            _logger.LogWarning("Message retries has been exhausted {@context}", new
+            _logger.LogWarning(context.Exception, "Message retries has been exhausted {@context}", new
             {
                 MessageId = consumeContext.MessageId,
                 ConversationId = consumeContext.ConversationId,
@@ -85,8 +84,7 @@ namespace Swisschain.Extensions.MassTransit.Audit
                 SentTime = consumeContext.SentTime,
                 Message = message,
                 MessageType = message?.GetType(),
-                RetryAttempt = context.RetryAttempt,
-                Exception = context.Exception
+                RetryAttempt = context.RetryAttempt
             });
 
             return Task.CompletedTask;
