@@ -32,6 +32,22 @@ namespace Swisschain.Extensions.MassTransit.Audit
 
         public Task PostFault<T>(RetryContext<T> context) where T : class, PipeContext
         {
+            var consumeContext = (ConsumeContext)context.Context;
+            var message = GetMessage(consumeContext);
+
+            _logger.LogWarning("Message processing has been failed {@context}", new
+            {
+                MessageId = consumeContext.MessageId,
+                ConversationId = consumeContext.ConversationId,
+                CorrelationId = consumeContext.CorrelationId,
+                RedeliveryCount = consumeContext.GetRedeliveryCount(),
+                SentTime = consumeContext.SentTime,
+                Message = message,
+                MessageType = message?.GetType(),
+                RetryAttempt = context.RetryAttempt,
+                Exception = context.Exception
+            });
+
             return Task.CompletedTask;
         }
 
@@ -57,6 +73,22 @@ namespace Swisschain.Extensions.MassTransit.Audit
 
         public Task RetryFault<T>(RetryContext<T> context) where T : class, PipeContext
         {
+            var consumeContext = (ConsumeContext)context.Context;
+            var message = GetMessage(consumeContext);
+
+            _logger.LogWarning("Message retries has been exhausted {@context}", new
+            {
+                MessageId = consumeContext.MessageId,
+                ConversationId = consumeContext.ConversationId,
+                CorrelationId = consumeContext.CorrelationId,
+                RedeliveryCount = consumeContext.GetRedeliveryCount(),
+                SentTime = consumeContext.SentTime,
+                Message = message,
+                MessageType = message?.GetType(),
+                RetryAttempt = context.RetryAttempt,
+                Exception = context.Exception
+            });
+
             return Task.CompletedTask;
         }
 
