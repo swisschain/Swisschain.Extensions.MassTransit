@@ -1,6 +1,4 @@
 ﻿using System;
-using GreenPipes;
-using GreenPipes.Configurators;
 using MassTransit;
 using MassTransit.EndpointConfigurators;
 
@@ -21,14 +19,7 @@ namespace Swisschain.Extensions.MassTransit.Retries
         {
             configurator.UseScheduledRedelivery(x =>
             {
-                x.Intervals(
-                    TimeSpan.FromSeconds(5),
-                    TimeSpan.FromSeconds(30),
-                    TimeSpan.FromSeconds(60),
-                    TimeSpan.FromMinutes(10),
-                    TimeSpan.FromMinutes(30));
-
-                ConfigureExceptions(x);
+                _options.SecondLevelRetriesConfigurator.Invoke(x);
             });
 
             configurator.UseMessageRetry(x =>
@@ -38,25 +29,8 @@ namespace Swisschain.Extensions.MassTransit.Retries
                     x.AddRetriesAudit(_serviceProvider);
                 }
 
-                x.Intervals(
-                    TimeSpan.FromMilliseconds(0),
-                    TimeSpan.FromMilliseconds(100),
-                    TimeSpan.FromMilliseconds(200),
-                    TimeSpan.FromSeconds(1),
-                    TimeSpan.FromSeconds(3));
-
-                ConfigureExceptions(x);
+                _options.FirstLevelRetriesConfigurator.Invoke(x);
             });
-        }
-
-        private static void ConfigureExceptions(IExceptionConfigurator configurator)
-        {
-            configurator.Ignore<ArgumentException>();
-            configurator.Ignore<NullReferenceException>();
-            configurator.Ignore<InvalidCastException>();
-            configurator.Ignore<IndexOutOfRangeException>();
-            configurator.Ignore<NotSupportedException>();
-            configurator.Ignore<NotImplementedException>();
         }
     }
 }
