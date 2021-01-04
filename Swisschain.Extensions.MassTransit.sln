@@ -7,6 +7,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Swisschain.Extensions.MassT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "tests\TestApp\TestApp.csproj", "{8C001B55-F4C1-47D9-B5E2-E745003A2473}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{4B2B50BA-0605-4D98-970A-2D6C58AD26E1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{40209A1D-D390-4F49-831C-519B18353FDE}"
+ProjectSection(SolutionItems) = preProject
+	.github\workflows\DeployNuget.yml = .github\workflows\DeployNuget.yml
+	.github\workflows\ValidateCommit.yml = .github\workflows\ValidateCommit.yml
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,5 +35,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B4BE940B-5667-456C-918D-9971C52C097F}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{40209A1D-D390-4F49-831C-519B18353FDE} = {4B2B50BA-0605-4D98-970A-2D6C58AD26E1}
 	EndGlobalSection
 EndGlobal
